@@ -18,67 +18,94 @@
 ## The computer is the dealer.
 
 import random
+from replit import clear
 cards = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
-dealer_cards = []
-player_cards = []
-win = False
+
 
 from art import logo
-print(logo)
+
 
 print("May the odds ever be in your favor!")
 print("Let's deal!")
 
 #draw card 
 def draw_card(user_hand):
+  """Returns a random card from the deck."""
   card = random.randint(0,12)
   user_hand.append(cards[card])
 
 
 #Adds cards in hand
-def add_hand(user_hand):
-  score = 0
-  for card in user_hand:
-    score = score + card
+def calculate_score(user_hand):
+  score = sum(user_hand)
+  #Checks for blackjack in 2 cards
+  if len(user_hand) == 2 and score == 21:
+    return 0
+
+  #Checks for ace and > 21
+  if 11 in user_hand and score > 21:
+    user_hand.remove(11)
+    user_hand.append(1)  
   return score
 
-#Checks for first round blackjack - Ace & 10
-def blackjack(user_hand):
-  blackjack = False
-  if user_hand[0] != 11 and user_hand[1] != 11:
-    blackjack = False
-    return blackjack
-  elif user_hand[0] == 11 or user_hand[1] == 11:
-    if user_hand[0] == 10 or user_hand[1] == 10:
-      blackjack = True
-      return blackjack
-    else: 
-      blackjack = False
-      return blackjack
+#Comparing scores
+def compare(player_score, dealer_score):
+  if player_score == dealer_score:
+    return "Draw"
+  elif dealer_score == 0:
+    return "Lose, opponent has Blackjack"
+  elif player_score == 0:
+    return "Win, you have Blackjack!"
+  elif player_score > 21:
+    return "You went over.  You lose."
+  elif dealer_score > 21:
+    return "Oppenent busted.  You win!"
+  elif player_score > dealer_score:
+    return "You win!"
+  else:
+    return "You lose."
 
-#Dealer Starting Hand
-draw_card(dealer_cards)
-draw_card(dealer_cards)
-print(f"Dealer cards: {dealer_cards}")
-add_hand(dealer_cards)
-win_dealer = blackjack(dealer_cards)
+def play_game():
+  dealer_cards = []
+  player_cards = []
+  is_game_over = False
+  print(logo)
+  #Starting Hands
+  for _ in range(2):
+    draw_card(player_cards)
+    draw_card(dealer_cards)
 
+  #This loop runs when player wants to keep drawing cards
+  while not is_game_over:
+    player_score = calculate_score(player_cards)
+    dealer_score = calculate_score(dealer_cards)
+    print(f"Your cards: {player_cards}, current score: {player_score}")
+    print(f"Dealer's card: {dealer_cards[0]}")
 
-#Player starting hand
-draw_card(player_cards)
-draw_card(player_cards)
-print(f"Player cards: {player_cards}")
-add_hand(player_cards)
-win_player = blackjack(player_cards)
+    if player_score == 0 or dealer_score == 0 or player_score > 21:
+      is_game_over = True
 
-#Blackjack game over
-if win_dealer == True:
-  print("The Dealer has blackjack.  You lose.")
-elif win_player == True:
-  print("You have blackjack!  You win!")
+    else:
+      player_should_deal = input("Type 'h' for a hit or 's' to stay:  ")
+      if player_should_deal == 'h':
+        draw_card(player_cards)
+      else:
+        is_game_over = True
 
-#Check User's score
+  #Dealer strategy
+  while dealer_score != 0 and dealer_score < 17:
+    draw_card(dealer_cards)
+    dealer_score = calculate_score(dealer_cards)
+    print(dealer_score)
+    print(dealer_cards)
 
+  print(f"Your final hand was {player_cards}, final score: {player_score}")
+  print(f"Dealer's final hand was {dealer_cards}, final score: {dealer_score}")
+  print(compare(player_score, dealer_score))
+
+while input("Do you want to play a game of Blackjack? Type 'y' or 'n':  ") == 'y':
+  clear()
+  play_game()
 
 ##################### Hints #####################
 
