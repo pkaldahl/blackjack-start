@@ -19,7 +19,7 @@
 
 import random
 cards = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
-dealer_cards = []
+dealer_cards = [11, 5, 10]
 player_cards = []
 
 from art import logo
@@ -28,75 +28,87 @@ print(logo)
 print("May the odds ever be in your favor!")
 print("Let's deal!")
 
-#draw card 
-def draw_card(card_holder):
+#draw player card 
+def draw_player_card():
   card = random.randint(0,12)
-  card_holder.append(cards[card])
-  
+  player_cards.append(cards[card])
 
-#calculate score
-def calculate_score(card_holder):
-  score = 0
-  print(card_holder)
-  score = 0
-  aces = 0
-  for card in card_holder:
-    score += card
+#draw dealer card
+def draw_dealer_card():
+  card = random.randint(0,12)
+  dealer_cards.append(cards[card])
+
+#calculate player score
+def calculate_player_score():
+  print(player_cards)
+  player_score = 0
+  aces_in_hand = 0
+  #aces in hand
+  for card in player_cards:
+    player_score +=card
     if card == 11:
-      aces = aces + 1
-      print(f"aces in hand {aces}")
-  while score > 21 and aces > 0:
-      score = score - 10
-      aces = aces - 1
-  return score
-  
-#Score result player
-def score_analysis(score):
-  if score == 21:
-      print("BLACKJACK!")
-  elif score < 21:
-      card_hit = input("Would you like a hit or stay?  Type 'h' or 's': ")
-      if card_hit == 'h':
-        player_hit()
-      else:
-        print(f"Your score is {score}.")
-  elif score > 21:
-      print("BUSTED!")
-
-#Score result dealer
-def score_analysis_dealer(score):
-  if score == 21:
-      print("BLACKJACK!")
-  elif score > 21:
-      print("BUSTED!")
-  elif score < 21 and score > 16:
-      print(f"The dealer's score is {score}.")
+      aces_in_hand = aces_in_hand + 1
+      print(f"aces in hand {aces_in_hand}")
+  if player_score == 21:
+    print("BLACKJACK!")
+    return player_score
+  elif player_score < 21:
+    return player_score
+  elif player_score > 21 and aces_in_hand == 0:
+    print("BUSTED!")
+    return player_score
   else:
-      draw_card(dealer_cards)
-      calculate_score(dealer_cards)
-
-#player hit
-def player_hit():
-  draw_card(player_cards)
-  player_score = calculate_score(player_cards)
-  print(f"Your score is {player_score}")
-  hit = score_analysis(player_score)
-
-
+    while player_score > 21 and aces_in_hand > 0:
+      player_score = player_score - 10
+      aces_in_hand = aces_in_hand - 1
+      print(aces_in_hand)
+    return player_score
   
-#opening hand
-draw_card(player_cards)
-draw_card(dealer_cards)
-draw_card(dealer_cards)
+  
+#calculate dealer's score
+def calculate_dealer_score():
+  deal_again = True
+  while deal_again:
+    dealer_score = 0
+    aces_in_hand = 0
+    for card in dealer_cards:
+      dealer_score = dealer_score + card
+      if card == 11:
+        aces_in_hand = aces_in_hand + 1
+        print(f"aces in dealer's hand {aces_in_hand}")
+    if dealer_score == 21:
+      print("BLACKJACK!")
+      deal_again = False
+      return dealer_score
+    elif dealer_score < 17:
+        print("Dealer must draw again")
+        draw_dealer_card()
+        print(dealer_cards)
+    elif dealer_score > 21 and aces_in_hand == 0:
+        print("BUSTED!")
+        return dealer_score
+    else:
+      while dealer_score > 21 and aces_in_hand > 0:
+        dealer_score = dealer_score - 10
+        aces_in_hand = aces_in_hand - 1
+        print(aces_in_hand)
+        if dealer_score < 21:
+          deal_again = True
+      return dealer_score
+  
+#opening player hand
+draw_player_card()
+draw_player_card()
+player_total = calculate_player_score()
+print(f"Your score is {player_total}")
+
+#opening dealer hand
+# draw_dealer_card()
+# draw_dealer_card()
 print(f"The dealer's card is {dealer_cards[0]}")
-player_hit()
-
-  
-
-#Dealer Score 
 print(dealer_cards)
-dealer_score = calculate_score(dealer_cards)
-score_analysis_dealer(dealer_score)
+dealer_total = calculate_dealer_score()
+print(f"The dealer's score is {dealer_total}")
 
 
 
