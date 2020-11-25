@@ -19,8 +19,9 @@
 
 import random
 cards = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
-dealer_cards = [11, 5, 10]
+dealer_cards = []
 player_cards = []
+win = False
 
 from art import logo
 print(logo)
@@ -28,89 +29,55 @@ print(logo)
 print("May the odds ever be in your favor!")
 print("Let's deal!")
 
-#draw player card 
-def draw_player_card():
+#draw card 
+def draw_card(user_hand):
   card = random.randint(0,12)
-  player_cards.append(cards[card])
-
-#draw dealer card
-def draw_dealer_card():
-  card = random.randint(0,12)
-  dealer_cards.append(cards[card])
-
-#calculate player score
-def calculate_player_score():
-  print(player_cards)
-  player_score = 0
-  aces_in_hand = 0
-  #aces in hand
-  for card in player_cards:
-    player_score +=card
-    if card == 11:
-      aces_in_hand = aces_in_hand + 1
-      print(f"aces in hand {aces_in_hand}")
-  if player_score == 21:
-    print("BLACKJACK!")
-    return player_score
-  elif player_score < 21:
-    return player_score
-  elif player_score > 21 and aces_in_hand == 0:
-    print("BUSTED!")
-    return player_score
-  else:
-    while player_score > 21 and aces_in_hand > 0:
-      player_score = player_score - 10
-      aces_in_hand = aces_in_hand - 1
-      print(aces_in_hand)
-    return player_score
-  
-  
-#calculate dealer's score
-def calculate_dealer_score():
-  deal_again = True
-  while deal_again:
-    dealer_score = 0
-    aces_in_hand = 0
-    for card in dealer_cards:
-      dealer_score = dealer_score + card
-      if card == 11:
-        aces_in_hand = aces_in_hand + 1
-        print(f"aces in dealer's hand {aces_in_hand}")
-    if dealer_score == 21:
-      print("BLACKJACK!")
-      deal_again = False
-      return dealer_score
-    elif dealer_score < 17:
-        print("Dealer must draw again")
-        draw_dealer_card()
-        print(dealer_cards)
-    elif dealer_score > 21 and aces_in_hand == 0:
-        print("BUSTED!")
-        return dealer_score
-    else:
-      while dealer_score > 21 and aces_in_hand > 0:
-        dealer_score = dealer_score - 10
-        aces_in_hand = aces_in_hand - 1
-        print(aces_in_hand)
-        if dealer_score < 21:
-          deal_again = True
-      return dealer_score
-  
-#opening player hand
-draw_player_card()
-draw_player_card()
-player_total = calculate_player_score()
-print(f"Your score is {player_total}")
-
-#opening dealer hand
-# draw_dealer_card()
-# draw_dealer_card()
-print(f"The dealer's card is {dealer_cards[0]}")
-print(dealer_cards)
-dealer_total = calculate_dealer_score()
-print(f"The dealer's score is {dealer_total}")
+  user_hand.append(cards[card])
 
 
+#Adds cards in hand
+def add_hand(user_hand):
+  score = 0
+  for card in user_hand:
+    score = score + card
+  return score
+
+#Checks for first round blackjack - Ace & 10
+def blackjack(user_hand):
+  blackjack = False
+  if user_hand[0] != 11 and user_hand[1] != 11:
+    blackjack = False
+    return blackjack
+  elif user_hand[0] == 11 or user_hand[1] == 11:
+    if user_hand[0] == 10 or user_hand[1] == 10:
+      blackjack = True
+      return blackjack
+    else: 
+      blackjack = False
+      return blackjack
+
+#Dealer Starting Hand
+draw_card(dealer_cards)
+draw_card(dealer_cards)
+print(f"Dealer cards: {dealer_cards}")
+add_hand(dealer_cards)
+win_dealer = blackjack(dealer_cards)
+
+
+#Player starting hand
+draw_card(player_cards)
+draw_card(player_cards)
+print(f"Player cards: {player_cards}")
+add_hand(player_cards)
+win_player = blackjack(player_cards)
+
+#Blackjack game over
+if win_dealer == True:
+  print("The Dealer has blackjack.  You lose.")
+elif win_player == True:
+  print("You have blackjack!  You win!")
+
+#Check User's score
 
 
 ##################### Hints #####################
